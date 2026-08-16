@@ -3181,85 +3181,26 @@
         printHTML(page);
     }
 
-    function getAllReportStudentsForPrint() {
-        const classList = ['PG','Nursery','KG','1','2','3','4','5','6','7'];
-        const students = [];
-        classList.forEach(className => {
-            (db.students[className] || []).forEach(student => {
-                students.push({ ...student, className: className });
-            });
-        });
-        return students;
-    }
-
-    function populateReportPrintStudentSelect() {
-        const select = document.getElementById('reportPrintStudentSelect');
-        if (!select) return;
-        select.innerHTML = '<option value="">Select a student</option>';
-        const students = getAllReportStudentsForPrint();
-        students.forEach((student, index) => {
-            const option = document.createElement('option');
-            option.value = String(index);
-            const idText = student.id ? `ID: ${student.id}` : '';
-            const rollText = student.rollNo !== undefined && student.rollNo !== null && String(student.rollNo) !== '' ? `Roll: ${student.rollNo}` : '';
-            const details = [idText, rollText, `Class: ${student.className}`].filter(Boolean).join(' | ');
-            option.textContent = `${student.name || 'Unnamed Student'}${details ? ' — ' + details : ''}`;
-            select.appendChild(option);
-        });
-    }
-
-    function openReportPrintSelection() {
-        if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can print filtered reports', 'error'); return; }
-        populateReportPrintStudentSelect();
-        const mode = document.getElementById('reportPrintMode');
-        const select = document.getElementById('reportPrintStudentSelect');
-        if (!mode || !select) { printAllFilteredReports(); return; }
-        mode.value = 'all';
-        select.value = '';
-        select.disabled = true;
-        document.getElementById('reportPrintSelectionModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeReportPrintSelection() {
-        const modal = document.getElementById('reportPrintSelectionModal');
-        if (modal) modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-
-    function toggleReportPrintStudentSelect() {
-        const mode = document.getElementById('reportPrintMode');
-        const select = document.getElementById('reportPrintStudentSelect');
-        if (!mode || !select) return;
-        select.disabled = mode.value !== 'single';
-        if (select.disabled) select.value = '';
-    }
-
-    function confirmReportPrint() {
-        if (currentUser && currentUser.role === 'Teacher') {
-            closeReportPrintSelection();
-            showToast('Only admin can print filtered reports', 'error');
-            return;
-        }
-
-        const mode = document.getElementById('reportPrintMode')?.value || 'all';
-
-        if (mode === 'single') {
-            const selectedIndex = document.getElementById('reportPrintStudentSelect')?.value || '';
-            if (selectedIndex === '') { showToast('Please select a student to print', 'warning'); return; }
-
-            const students = getAllReportStudentsForPrint();
-            const student = students[Number(selectedIndex)];
-            if (!student) { showToast('Student not found!', 'error'); return; }
-
-            closeReportPrintSelection();
-            printHTML(buildStudentReportPage(student, student.className));
-            return;
-        }
-
-        closeReportPrintSelection();
-        printAllFilteredReports();
-    }
+    function getReportSubjects(c){return (db.subjects&&db.subjects[c]||[]).map(s=>typeof s==='string'?{name:s,total:100}:{name:s?.name||'',total:Number(s?.total||100)}).filter(s=>s.name);}
+    function getStudentResultSummaryData(s,c){let a=0,t=0,m={};getReportSubjects(c).forEach(x=>{let v=Number((s.marks||{})[x.name]||0);m[x.name]=x.total>0?((v/x.total)*100).toFixed(1):'0.0';a+=v;t+=x.total;});let o=t>0?((a/t)*100).toFixed(1):'0.0';return{subjects:getReportSubjects(c),subjectResults:m,overall:o,grade:getGrade(o).label};}
+    function getClassOverallPercentage(c){let a=0,t=0;(db.students[c]||[]).forEach(s=>getReportSubjects(c).forEach(x=>{a+=Number((s.marks||{})[x.name]||0);t+=x.total;}));return t>0?((a/t)*100).toFixed(1):'0.0';}
+    function reportPrintHeader(title){return `<div class="report-header"><h1>🏫 The Educators</h1><h2>Ahmed Haseeb Campus, Mor Kunda</h2><h3>${title}</h3></div>`;}
+    function reportPrintStyles(){return `<style>.custom-report-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12px}.custom-report-table th,.custom-report-table td{border:1px solid #d1d5db;padding:7px 8px;text-align:left;vertical-align:top}.custom-report-table th{background:#f3f4f6;font-weight:700;text-align:center}.custom-report-table td.center{text-align:center}.custom-report-meta{display:flex;justify-content:space-between;margin:8px 0;font-size:11px;color:#4b5563}</style>`;}
+    function buildClassContactReport(c){let r=(db.students[c]||[]).map((s,i)=>`<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td>${s.contact||''}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader(`Class Contact List — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Contact / Phone Number</th></tr></thead><tbody>${r||'<tr><td colspan="3" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
+    function getStudentFeeTotal(s,c){let f=(db.fees||[]).filter(x=>String(x.studentId||x.student||'')===String(s.id||'')||(String(x.studentName||x.name||'')===String(s.name||'')&&String(x.class||x.className||'')===String(c)));return f.length?f.reduce((a,x)=>a+Number(x.amount||x.total||0),0):Number(s.totalFee||s.fee||0);}
+    function buildStudentFeeListReport(c){let r=(db.students[c]||[]).map((s,i)=>`<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td><td>${s.contact||''}</td><td class="center">${getStudentFeeTotal(s,c)||0}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader(`Student Fee List — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th><th>Phone Number</th><th>Total Fees</th></tr></thead><tbody>${r||'<tr><td colspan="5" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
+    function buildStudentBasicListReport(c){let r=(db.students[c]||[]).map((s,i)=>`<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader(`Student Basic List — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th></tr></thead><tbody>${r||'<tr><td colspan="3" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
+    function buildTeacherListReport(){let r=(db.teachers||[]).map((t,i)=>`<tr><td class="center">${i+1}</td><td>${t.name||''}</td><td>${t.contact||''}</td><td>${t.qualification||'N/A'}</td><td>${t.subject||''}</td><td>${t.class||''}</td><td class="center">${t.experience||0}</td><td>${t.address||''}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader('Teacher List')}<div class="custom-report-meta"><span><b>Total Teachers:</b> ${(db.teachers||[]).length}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Teacher Name</th><th>Contact / Phone</th><th>Qualification</th><th>Subject</th><th>Class</th><th>Experience (Years)</th><th>Address</th></tr></thead><tbody>${r||'<tr><td colspan="8" class="center">No teachers found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
+    function buildClassPercentageReport(){let cs=['PG','Nursery','KG','1','2','3','4','5','6','7'];let r=cs.map((c,i)=>`<tr><td class="center">${i+1}</td><td class="center">${c}</td><td class="center">${getClassOverallPercentage(c)}%</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader('Class Percentage Report')}<div class="custom-report-meta"><span><b>Classes:</b> All Classes</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Class Name</th><th>Overall Percentage</th></tr></thead><tbody>${r}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
+    function buildStudentResultSummaryReport(c){let ss=db.students[c]||[],sub=getReportSubjects(c),heads=sub.map(x=>`<th>${x.name} %</th>`).join(''),r=ss.map((s,i)=>{let x=getStudentResultSummaryData(s,c);return `<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td>${sub.map(q=>`<td class="center">${x.subjectResults[q.name]||'0.0'}%</td>`).join('')}<td class="center">${x.overall}%</td><td class="center"><b>${x.grade}</b></td></tr>`}).join('');return `<div class="report-page">${reportPrintHeader(`Student Result Summary — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th>${heads}<th>Overall %</th><th>Grade</th></tr></thead><tbody>${r||'<tr><td colspan="20" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
+    function buildCompleteStudentReport(c){let r=(db.students[c]||[]).map((s,i)=>{let x=getStudentResultSummaryData(s,c),subs=x.subjects.map(q=>`${q.name}: ${Number((s.marks||{})[q.name]||0)}/${q.total}`).join(', ');return `<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td><td>${subs||'N/A'}</td><td>${s.father||''}</td><td class="center">${x.overall}%</td></tr>`}).join('');return `<div class="report-page">${reportPrintHeader(`Complete Student Report — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th><th>Subjects</th><th>Father Name</th><th>Total / Overall %</th></tr></thead><tbody>${r||'<tr><td colspan="6" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
+    function populateReportPrintClassSelect(){let s=document.getElementById('reportPrintClassSelect');if(s)s.innerHTML=['PG','Nursery','KG','1','2','3','4','5','6','7'].map(c=>`<option value="${c}">Class ${c}</option>`).join('');}
+    function populateReportPrintStudentSelect(){let s=document.getElementById('reportPrintStudentSelect'),c=document.getElementById('reportPrintClassSelect')?.value;if(!s||!c)return;s.innerHTML='<option value="">All students in selected class</option>'+(db.students[c]||[]).map((x,i)=>`<option value="${i}">${x.name||'Unnamed'}${x.id?' — ID: '+x.id:''}${x.rollNo?' | Roll: '+x.rollNo:''}</option>`).join('');}
+    function reportPrintTypeChanged(){let t=document.getElementById('reportPrintType')?.value;document.getElementById('reportPrintClassWrap')?.classList.toggle('hidden',t==='teacher-list'||t==='class-percentage');document.getElementById('reportPrintStudentWrap')?.classList.toggle('hidden',t!=='student-result');populateReportPrintClassSelect();populateReportPrintStudentSelect();}
+    function reportPrintClassChanged(){populateReportPrintStudentSelect();}
+    function openReportPrintSelection(){if(currentUser&&currentUser.role==='Teacher'){showToast('Only admin can print reports','error');return;}let m=document.getElementById('reportPrintSelectionModal');if(!m){printAllFilteredReports();return;}document.getElementById('reportPrintType').value='class-contact';reportPrintTypeChanged();m.classList.remove('hidden');document.body.style.overflow='hidden';}
+    function closeReportPrintSelection(){document.getElementById('reportPrintSelectionModal')?.classList.add('hidden');document.body.style.overflow='auto';}
+    function confirmReportPrint(){let t=document.getElementById('reportPrintType')?.value,c=document.getElementById('reportPrintClassSelect')?.value||'PG',page='';if(t==='class-contact')page=buildClassContactReport(c);else if(t==='student-fee')page=buildStudentFeeListReport(c);else if(t==='student-basic')page=buildStudentBasicListReport(c);else if(t==='teacher-list')page=buildTeacherListReport();else if(t==='class-percentage')page=buildClassPercentageReport();else if(t==='student-result')page=buildStudentResultSummaryReport(c);else if(t==='complete-student')page=buildCompleteStudentReport(c);if(!page){showToast('Please select a report type','warning');return;}closeReportPrintSelection();printHTML(reportPrintStyles()+page);}
 
     function printAllFilteredReports() {
         if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can print filtered reports', 'error'); return; }
@@ -3548,38 +3489,7 @@
 </script>
 
 <!-- Reports print student selection: only selects which existing report page(s) are printed. -->
-<div id="reportPrintSelectionModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
-    <div class="modal-content bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 relative">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-print mr-2"></i> Print Report</h2>
-            <button onclick="closeReportPrintSelection()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">×</button>
-        </div>
-
-        <div class="space-y-4">
-            <div>
-                <label class="text-xs text-gray-500 font-bold uppercase block mb-1">Student Selection</label>
-                <select id="reportPrintMode" onchange="toggleReportPrintStudentSelect()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-                    <option value="all">All Students</option>
-                    <option value="single">Single Student</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Student</label>
-                <select id="reportPrintStudentSelect" disabled class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none disabled:opacity-60">
-                    <option value="">Select a student</option>
-                </select>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeReportPrintSelection()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xs px-4 py-2 rounded-xl transition">Cancel</button>
-                <button onclick="confirmReportPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-1">
-                    <i class="fa-solid fa-print"></i> Print
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="reportPrintSelectionModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4"><div class="modal-content bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 relative"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-print mr-2"></i> Print Report</h2><button onclick="closeReportPrintSelection()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">×</button></div><div class="space-y-4"><div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Report Type</label><select id="reportPrintType" onchange="reportPrintTypeChanged()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm"><option value="class-contact">Class Contact List</option><option value="student-fee">Student Fee List</option><option value="student-basic">Student Basic List</option><option value="teacher-list">Teacher List</option><option value="class-percentage">Class Percentage Report</option><option value="student-result">Student Result Summary</option><option value="complete-student">Complete Student Report</option></select></div><div id="reportPrintClassWrap"><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Class</label><select id="reportPrintClassSelect" onchange="reportPrintClassChanged()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm"></select></div><div id="reportPrintStudentWrap" class="hidden"><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Student</label><select id="reportPrintStudentSelect" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm"></select></div><div class="flex justify-end gap-2 pt-2"><button onclick="closeReportPrintSelection()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xs px-4 py-2 rounded-xl">Cancel</button><button onclick="confirmReportPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl"><i class="fa-solid fa-print"></i> Print Report</button></div></div></div></div>
 
 <script>
     document.addEventListener('keydown', function(e) {
