@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete School Management System - The Educators</title>
     <script src="./Complete School Management System - The Educators_files/saved_resource"></script>
-    <link rel="stylesheet" href="./Complete School Management System - The Educators_files/all.min.css">
+    <!-- Font Awesome: GitHub Pages compatible CDN (replaces missing local _files/all.min.css) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="./Complete School Management System - The Educators_files/chart.js.download"></script>
     
     <style>
@@ -1064,6 +1065,7 @@
                                 <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                                     <h4 class="font-bold text-gray-800">Student Performance</h4>
                                     <div class="flex flex-wrap items-center gap-2">
+                                        <select id="reportsTeacherFilter" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" onchange="loadPerformance()"><option value="All">All Teachers</option></select>
                                         <select id="reportsClassFilter" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" onchange="loadPerformance()">
                                             <option value="All">All Classes</option>
                                             <option value="PG">PG</option><option value="Nursery">Nursery</option><option value="KG">KG</option>
@@ -1075,7 +1077,7 @@
                                             <select id="reportsYearSelect" onchange="loadPerformance()"><option value="all">All Years</option><option value="2025">2025</option><option value="2026" selected="">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select>
                                         </div>
                                         <input type="text" id="reportsSearchInput" placeholder="Search student name..." class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none w-48" oninput="loadPerformance()">
-                                        <button onclick="printAllFilteredReports()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1 admin-only"><i class="fa-solid fa-print"></i> Print All</button>
+                                        <button onclick="openReportPrintSelection()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1 admin-only"><i class="fa-solid fa-print"></i> Print All</button>
                                     </div>
                                 </div>
                                 <div class="overflow-x-auto">
@@ -1091,7 +1093,7 @@
                 <td class="py-2 px-3 text-center font-bold text-green-600">96%</td>
                 <td class="py-2 px-3 text-center font-bold text-blue-600">75%</td>
                 <td class="py-2 px-3 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold text-green-700 bg-opacity-20">B</span></td>
-                <td class="py-2 px-3 text-center"><button onclick="printAllFilteredReports()" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded transition admin-only"><i class="fa-solid fa-print"></i> Print</button></td>
+                <td class="py-2 px-3 text-center"><button onclick="openReportPrintSelection()" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded transition admin-only"><i class="fa-solid fa-print"></i> Print</button></td>
             </tr><tr class="border-b border-gray-100 hover:bg-gray-50 transition">
                 <td class="py-2 px-3 font-semibold text-gray-800">Student 2 (PG)</td>
                 <td class="py-2 px-3 font-medium">PG</td>
@@ -1377,6 +1379,9 @@
                 <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">WhatsApp Number</label><input type="text" id="modalWhatsapp" class="w-full border-b-2 border-gray-200 py-2 focus:border-blue-600 focus:outline-none font-bold text-gray-800"></div>
                 <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Blood Group</label><select id="modalBloodGroup" class="w-full border-b-2 border-gray-200 py-2 focus:border-blue-600 focus:outline-none font-bold text-gray-800"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
                 <div class="md:col-span-2"><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Address</label><input type="text" id="modalAddress" class="w-full border-b-2 border-gray-200 py-2 focus:border-blue-600 focus:outline-none font-bold text-gray-800"></div>
+                <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Joining Date</label><input type="date" id="modalJoiningDate" class="w-full border-b-2 border-gray-200 py-2 focus:border-blue-600 focus:outline-none font-bold text-gray-800"></div>
+                <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Student Status</label><select id="modalStudentStatus" class="w-full border-b-2 border-gray-200 py-2 focus:border-blue-600 focus:outline-none font-bold text-gray-800"><option value="Present">Present</option><option value="Left">Left</option></select></div>
+                <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Leaving Date</label><input type="date" id="modalLeavingDate" class="w-full border-b-2 border-gray-200 py-2 focus:border-blue-600 focus:outline-none font-bold text-gray-800"></div>
                 <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Tuition Fee Status</label><select id="modalFeeStatus" class="w-full border-b-2 border-gray-200 py-2 focus:border-blue-600 focus:outline-none font-bold text-gray-800 bg-transparent"><option value="Paid">✅ Paid</option><option value="Pending">⏳ Pending</option><option value="Partial">🔄 Partial</option></select></div>
             </div>
             <h3 class="font-bold text-blue-900 border-b pb-2 mb-3 text-lg"><i class="fa-regular fa-star mr-2"></i> Subject Wise Marks <span class="text-xs font-normal text-gray-500 ml-2">(Edit any number, auto-calculates percentage)</span></h3>
@@ -1402,6 +1407,7 @@
                 <button onclick="closeModal()" class="px-6 py-2.5 bg-gray-200 text-gray-800 font-bold rounded-xl hover:bg-gray-300 transition">Cancel</button>
                 <button onclick="saveStudentChanges()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition flex items-center gap-2 shadow-lg"><i class="fa-solid fa-save"></i> Save &amp; Update</button>
                 <button onclick="printSingleStudent(currentEditingClass, currentEditingStudentId)" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition flex items-center gap-2 shadow-lg admin-only"><i class="fa-solid fa-print"></i> Print Report</button>
+                <button onclick="printLeavingCertificate(currentEditingClass, currentEditingStudentId)" class="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition flex items-center gap-2 shadow-lg admin-only"><i class="fa-solid fa-file-circle-check"></i> Leaving Certificate</button>
             </div>
         </div>
     </div>
@@ -1420,6 +1426,10 @@
                 <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Class</label><select id="teacherClass" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"><option value="PG">PG</option><option value="Nursery">Nursery</option><option value="KG">KG</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></div>
                 <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Experience (Years)</label><input type="number" id="teacherExperience" value="1" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"></div>
                 <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Contact Number</label><input type="text" id="teacherContact" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"></div>
+                <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Joining Date</label><input type="date" id="teacherJoiningDate" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"></div>
+                <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Teacher Status</label><select id="teacherStatus" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"><option value="Present">Present</option><option value="Left">Left</option></select></div>
+                <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Leaving Date</label><input type="date" id="teacherLeavingDate" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"></div>
+                <div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Replacement Teacher</label><select id="teacherReplacement" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"><option value="">No replacement</option></select></div>
                 <div class="md:col-span-2"><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Address</label><input type="text" id="teacherAddress" class="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:border-blue-500 focus:outline-none"></div>
             </div>
             <div class="flex gap-3 mt-4">
@@ -1711,25 +1721,10 @@
     function defaultSubjectObjects(className) { return (DEFAULT_SUBJECTS[className] || []).map(name => ({ name, total: 100 })); }
 
     function initializeDatabase() {
-        const saved = AppStorage.get('school_db_v10');
-        if (saved) { 
-            try { 
-                db = JSON.parse(saved); 
-                const classList = ['PG','Nursery','KG','1','2','3','4','5','6','7']; 
-                classList.forEach(c => { if (!db.students[c]) db.students[c] = []; if (!db.subjects[c]) db.subjects[c] = defaultSubjectObjects(c); }); 
-                if (!db.teachers) db.teachers = []; 
-                if (!db.attendance) db.attendance = {}; 
-                if (!db.attendanceMarkedDates) db.attendanceMarkedDates = {}; 
-                if (!db.fees) db.fees = []; 
-                if (!db.exams) db.exams = []; 
-                if (!db.examResults) db.examResults = {}; 
-                if (!db.notices) db.notices = []; 
-                if (!db.deleted) db.deleted = []; 
-                migrateSubjectsToObjects(); 
-                migrateStudentRollNumbers(); 
-            } catch(e) { createDefaultData(); } 
-        } else { createDefaultData(); }
-        if (!AppStorage.isAvailable) showToast('Note: browser storage is restricted here — data will only persist for this session.', 'warning');
+        // ONLINE-ONLY MODE: Google Sheets is the only source of school data.
+        db = {students:{},teachers:[],subjects:{},attendance:{},attendanceMarkedDates:{},fees:[],exams:[],examResults:{},notices:[],deleted:[]};
+        const classList=['PG','Nursery','KG','1','2','3','4','5','6','7'];
+        classList.forEach(c=>{db.students[c]=[];db.subjects[c]=defaultSubjectObjects(c);});
     }
 
     function migrateSubjectsToObjects() {
@@ -1739,6 +1734,11 @@
     function migrateStudentRollNumbers() {
         const classList = ['PG','Nursery','KG','1','2','3','4','5','6','7'];
         classList.forEach(c => { (db.students[c] || []).forEach((student, idx) => { if (!student.rollNo) student.rollNo = idx + 1; if (!student.attendanceLog) student.attendanceLog = {}; }); });
+    }
+    function migrateStaffAndStudentDates() {
+        const classList = ['PG','Nursery','KG','1','2','3','4','5','6','7'];
+        classList.forEach(c => { (db.students[c] || []).forEach(s => { if (!s.joiningDate) s.joiningDate = ''; if (!s.studentStatus) s.studentStatus = 'Present'; if (!s.leavingDate) s.leavingDate = ''; }); });
+        (db.teachers || []).forEach(t => { if (!t.joiningDate) t.joiningDate = ''; if (!t.teacherStatus) t.teacherStatus = 'Present'; if (!t.leavingDate) t.leavingDate = ''; if (t.replacementTeacherId === undefined) t.replacementTeacherId = ''; });
     }
 
     function createDefaultData() {
@@ -1754,9 +1754,9 @@
             }
         });
         db.teachers = [
-            { id: 't1', name: 'Mr. Saleem Ahmed', qualification: 'M.Sc Mathematics', subject: 'Mathematics', class: 'PG', experience: 5, contact: '03001234567', address: 'Teacher Colony, Mor Kunda' },
-            { id: 't2', name: 'Ms. Amina Khan', qualification: 'M.A English', subject: 'English', class: 'Nursery', experience: 3, contact: '03007654321', address: 'Garden Town, Mor Kunda' },
-            { id: 't3', name: 'Mr. Usman Ali', qualification: 'M.A Urdu', subject: 'Urdu', class: 'KG', experience: 4, contact: '03009876543', address: 'Model Town, Mor Kunda' }
+            { id: 't1', name: 'Mr. Saleem Ahmed', qualification: 'M.Sc Mathematics', subject: 'Mathematics', class: 'PG', experience: 5, contact: '03001234567', address: 'Teacher Colony, Mor Kunda', joiningDate: '', teacherStatus: 'Present', leavingDate: '', replacementTeacherId: '' },
+            { id: 't2', name: 'Ms. Amina Khan', qualification: 'M.A English', subject: 'English', class: 'Nursery', experience: 3, contact: '03007654321', address: 'Garden Town, Mor Kunda', joiningDate: '', teacherStatus: 'Present', leavingDate: '', replacementTeacherId: '' },
+            { id: 't3', name: 'Mr. Usman Ali', qualification: 'M.A Urdu', subject: 'Urdu', class: 'KG', experience: 4, contact: '03009876543', address: 'Model Town, Mor Kunda', joiningDate: '', teacherStatus: 'Present', leavingDate: '', replacementTeacherId: '' }
         ];
         db.subjects = {};
         classList.forEach(c => { db.subjects[c] = defaultSubjectObjects(c); });
@@ -1828,34 +1828,22 @@
     }
 
     function syncDatabaseToGoogleSheet() {
-        // Take a snapshot NOW. This prevents a later edit from changing an
-        // earlier queued request and keeps all saves in the correct order.
-        const snapshot = JSON.stringify(db);
-
-        onlineSaveQueue = onlineSaveQueue.then(async () => {
-            let lastError = null;
-
-            // Retry a few times so a temporary internet problem does not
-            // immediately leave the Google Sheet behind.
-            for (let attempt = 1; attempt <= 3; attempt++) {
-                try {
-                    await postDatabaseWithForm(snapshot);
-                    AppStorage.set('school_last_online_sync', new Date().toISOString());
-                    AppStorage.remove('school_pending_online_db');
-                    return true;
-                } catch (error) {
-                    lastError = error;
-                    await new Promise(resolve => setTimeout(resolve, attempt * 1500));
+        if (!navigator.onLine) {
+            showToast('Internet connection required. Data was NOT saved. Please connect and try again.','error');
+            return Promise.resolve(false);
+        }
+        const snapshot=JSON.stringify(db);
+        onlineSaveQueue=onlineSaveQueue.then(async()=>{
+            for(let attempt=1;attempt<=3;attempt++){
+                try{await postDatabaseWithForm(snapshot);return true;}
+                catch(error){
+                    console.warn('Google Sheet sync failed:',error);
+                    if(attempt<3) await new Promise(resolve=>setTimeout(resolve,attempt*1500));
                 }
             }
-
-            // Keep the latest complete database locally so it can be retried
-            // automatically the next time the page is opened/online.
-            AppStorage.set('school_pending_online_db', snapshot);
-            console.warn('Google Sheet sync failed:', lastError);
+            showToast('Online save failed. Nothing was saved locally. Please try again.','error');
             return false;
         });
-
         return onlineSaveQueue;
     }
 
@@ -1879,59 +1867,28 @@
                 if (!db.deleted) db.deleted = [];
                 migrateSubjectsToObjects();
                 migrateStudentRollNumbers();
-                AppStorage.set('school_db_v10', JSON.stringify(db));
-                AppStorage.set('school_last_online_load', new Date().toISOString());
+                // No local school-data cache in online-only mode.
                 return true;
             }
         } catch (error) {
-            console.warn('Could not load master database from Google Sheets; using local copy.', error);
+            console.warn('Could not load master database from Google Sheets. No local database will be used.', error);
         }
         return false;
     }
 
     async function retryPendingOnlineSync() {
-        const pending = AppStorage.get('school_pending_online_db');
-        if (!pending) return;
-
-        try {
-            await postDatabaseWithForm(pending);
-            AppStorage.set('school_last_online_sync', new Date().toISOString());
-            AppStorage.remove('school_pending_online_db');
-        } catch (error) {
-            console.warn('Pending Google Sheet sync still unavailable:', error);
-        }
+        // ONLINE-ONLY MODE: no offline database queue exists.
+        return false;
     }
 
     async function saveDatabase() {
-        // Always save locally FIRST. This protects data during temporary
-        // internet outages.
-        const snapshot = JSON.stringify(db);
-
-        // Keep a small local rolling backup as an extra safety layer.
-        try {
-            const backupKey = 'school_db_backup_' + new Date().toISOString().replace(/[:.]/g, '-');
-            AppStorage.set(backupKey, snapshot);
-            const backupKeys = Object.keys(localStorage || {})
-                .filter(k => k.indexOf('school_db_backup_') === 0)
-                .sort();
-            while (backupKeys.length > 10) {
-                AppStorage.remove(backupKeys.shift());
-            }
-        } catch (e) {}
-
-        AppStorage.set('school_db_v10', snapshot);
-        AppStorage.set('school_last_updated', new Date().toLocaleString());
-        updateStats();
-
-        // Then send the COMPLETE database to Google Sheets. Therefore
-        // teachers, subjects, exams, attendance, fees, notices, students,
-        // results, deleted items, etc. all stay in the same online database.
-        const online = await syncDatabaseToGoogleSheet();
-
-        if (!online) {
-            showToast('Saved on this device. Online sync will retry automatically.', 'warning');
+        if (!navigator.onLine) {
+            showToast('Internet connection required. Data was NOT saved. Please connect and try again.','error');
+            return false;
         }
-
+        updateStats();
+        const online=await syncDatabaseToGoogleSheet();
+        if(!online) showToast('Data was NOT saved online. Please try again.','error');
         return online;
     }
 
@@ -1939,10 +1896,10 @@
         try {
             const ok = await syncDatabaseToGoogleSheet();
             if (ok) showToast('Data saved online successfully ✅', 'success');
-            else showToast('Online save failed. Your data is still safe on this device and will retry.', 'warning');
+            else showToast('Online save failed. Nothing was saved locally. Please try again.', 'warning');
             return ok;
         } catch (e) {
-            showToast('Online save failed. Your data is still safe on this device.', 'warning');
+            showToast('Online save failed. Nothing was saved locally. Please try again.', 'warning');
             return false;
         }
     }
@@ -1978,12 +1935,23 @@
     }
 
     // ==================== INIT ====================
-    function init() {
+    async function init() {
         populateYearSelectors();
         loadUsersFromStorage();
+
+        // ONLINE-ONLY MODE:
+        // First load the authoritative database from Google Sheets.
+        // Do not render an empty/local database before the online load finishes.
         initializeDatabase();
+        const onlineLoaded = await loadDatabaseFromGoogle();
+
+        if (!onlineLoaded) {
+            showToast('Could not load data from Google Sheets. Please check your internet connection and Apps Script deployment.', 'error');
+        }
+
         loadStudents();
         loadTeachers();
+        populateReportTeacherFilter();
         loadSubjects();
         loadAttendance();
         loadFees();
@@ -1995,13 +1963,16 @@
         updateDate();
         applyStoredDarkModePreference();
         populateFeeStudents();
+
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('attendanceDate').value = today;
         document.getElementById('examDate').value = today;
+
         const currentMonth = new Date().toLocaleString('default', { month: 'long' });
         const currentYear = new Date().getFullYear();
         document.querySelectorAll('select[id$="MonthSelect"]').forEach(sel => { if (sel) sel.value = currentMonth; });
         document.querySelectorAll('select[id$="YearSelect"]').forEach(sel => { if (sel) sel.value = currentYear; });
+
         document.getElementById('searchStudent').addEventListener('input', function() { loadStudents(this.value); });
         document.getElementById('studentSearchField').addEventListener('change', function() { loadStudents(document.getElementById('searchStudent').value); });
         document.getElementById('classSelect').addEventListener('change', function() { loadStudents(); });
@@ -2073,7 +2044,7 @@
             const className = document.getElementById('classSelect').value;
             const existing = db.students[className] || [];
             const nextRoll = existing.reduce((max, s) => Math.max(max, s.rollNo || 0), 0) + 1;
-            const newStudent = { id: 's_' + Math.random().toString(36).substr(2,8), rollNo: nextRoll, name: name.trim(), gender: 'Male', dob: '', father: '', contact: '', whatsapp: '', bloodGroup: '', address: '', absences: 0, present: 0, attendanceLog: {}, uniform: 'Good', syllabus: 'In Progress', feeStatus: 'Pending', marks: {} };
+            const newStudent = { id: 's_' + Math.random().toString(36).substr(2,8), rollNo: nextRoll, name: name.trim(), gender: 'Male', dob: '', father: '', contact: '', whatsapp: '', bloodGroup: '', address: '', joiningDate: '', studentStatus: 'Present', leavingDate: '', absences: 0, present: 0, attendanceLog: {}, uniform: 'Good', syllabus: 'In Progress', feeStatus: 'Pending', marks: {} };
             const subjects = db.subjects[className] || defaultSubjectObjects(className);
             subjects.forEach(sub => { newStudent.marks[sub.name] = 0; });
             if (!db.students[className]) db.students[className] = [];
@@ -2113,6 +2084,9 @@
         document.getElementById('modalWhatsapp').value = student.whatsapp || '';
         document.getElementById('modalBloodGroup').value = student.bloodGroup || '';
         document.getElementById('modalAddress').value = student.address || '';
+        document.getElementById('modalJoiningDate').value = student.joiningDate || '';
+        document.getElementById('modalStudentStatus').value = student.studentStatus || 'Present';
+        document.getElementById('modalLeavingDate').value = student.leavingDate || '';
         document.getElementById('modalFeeStatus').value = student.feeStatus || 'Pending';
         document.getElementById('printMonthYear').textContent = `Student Report - ${className}`;
         renderSubjectMarks(student, className);
@@ -2206,6 +2180,10 @@
         student.whatsapp = document.getElementById('modalWhatsapp').value;
         student.bloodGroup = document.getElementById('modalBloodGroup').value;
         student.address = document.getElementById('modalAddress').value;
+        student.joiningDate = document.getElementById('modalJoiningDate').value;
+        student.studentStatus = document.getElementById('modalStudentStatus').value;
+        student.leavingDate = document.getElementById('modalLeavingDate').value;
+        if (student.studentStatus === 'Present') student.leavingDate = '';
         student.feeStatus = document.getElementById('modalFeeStatus').value;
         const rows = document.querySelectorAll('#subjectsTableBody tr');
         rows.forEach(row => {
@@ -2243,7 +2221,7 @@
                 <td class="py-3 px-4 text-xs">${teacher.qualification || 'N/A'}</td>
                 <td class="py-3 px-4 font-medium">${teacher.subject}</td>
                 <td class="py-3 px-4 text-center font-medium">${teacher.class}</td>
-                <td class="py-3 px-4 text-center">${teacher.experience || 0} yrs</td>
+                <td class="py-3 px-4 text-center">${teacher.experience || 0} yrs<br><span class="text-[10px] ${teacher.teacherStatus === 'Left' ? 'text-red-600' : 'text-green-600'}">${teacher.teacherStatus || 'Present'}${teacher.joiningDate ? ' • Join: '+teacher.joiningDate : ''}${teacher.leavingDate ? ' • Leave: '+teacher.leavingDate : ''}</span></td>
                 <td class="py-3 px-4 text-center">
                     <div class="flex items-center justify-center gap-1">
                         <button onclick="editTeacher('${teacher.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded transition"><i class="fa-regular fa-pen-to-square"></i></button>
@@ -2257,7 +2235,35 @@
     }
 
     let currentEditingTeacherId = null;
-    function addNewTeacher() { currentEditingTeacherId = null; document.getElementById('teacherModalTitle').innerHTML = '<i class="fa-solid fa-chalkboard-user mr-2"></i> Teacher Details'; document.getElementById('teacherModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; document.getElementById('teacherName').value = ''; document.getElementById('teacherQualification').value = ''; document.getElementById('teacherSubject').value = ''; document.getElementById('teacherExperience').value = 1; document.getElementById('teacherContact').value = ''; document.getElementById('teacherAddress').value = ''; }
+    function populateTeacherReplacementSelect(currentId = '') {
+        const select = document.getElementById('teacherReplacement');
+        if (!select) return;
+        select.innerHTML = '<option value="">No replacement</option>';
+        (db.teachers || []).filter(t => t.id !== currentId).forEach(t => {
+            const o = document.createElement('option');
+            o.value = t.id;
+            o.textContent = `${t.name} (${t.class || 'N/A'})`;
+            select.appendChild(o);
+        });
+    }
+    function addNewTeacher() {
+        currentEditingTeacherId = null;
+        document.getElementById('teacherModalTitle').innerHTML = '<i class="fa-solid fa-chalkboard-user mr-2"></i> Teacher Details';
+        document.getElementById('teacherName').value = '';
+        document.getElementById('teacherQualification').value = '';
+        document.getElementById('teacherSubject').value = '';
+        document.getElementById('teacherClass').value = 'PG';
+        document.getElementById('teacherExperience').value = 1;
+        document.getElementById('teacherContact').value = '';
+        document.getElementById('teacherAddress').value = '';
+        document.getElementById('teacherJoiningDate').value = '';
+        document.getElementById('teacherStatus').value = 'Present';
+        document.getElementById('teacherLeavingDate').value = '';
+        populateTeacherReplacementSelect('');
+        document.getElementById('teacherReplacement').value = '';
+        document.getElementById('teacherModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
     function editTeacher(teacherId) {
         const teacher = db.teachers.find(t => t.id === teacherId);
         if (!teacher) { showToast('Teacher not found!', 'error'); return; }
@@ -2270,6 +2276,11 @@
         document.getElementById('teacherExperience').value = teacher.experience || 1;
         document.getElementById('teacherContact').value = teacher.contact || '';
         document.getElementById('teacherAddress').value = teacher.address || '';
+        document.getElementById('teacherJoiningDate').value = teacher.joiningDate || '';
+        document.getElementById('teacherStatus').value = teacher.teacherStatus || 'Present';
+        document.getElementById('teacherLeavingDate').value = teacher.leavingDate || '';
+        populateTeacherReplacementSelect(teacherId);
+        document.getElementById('teacherReplacement').value = teacher.replacementTeacherId || '';
         document.getElementById('teacherModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
@@ -2282,25 +2293,23 @@
         const experience = parseInt(document.getElementById('teacherExperience').value) || 1;
         const contact = document.getElementById('teacherContact').value.trim();
         const address = document.getElementById('teacherAddress').value.trim();
+        const joiningDate = document.getElementById('teacherJoiningDate').value;
+        const teacherStatus = document.getElementById('teacherStatus').value;
+        const leavingDate = document.getElementById('teacherLeavingDate').value;
+        const replacementTeacherId = document.getElementById('teacherReplacement').value;
         if (!name || !subject) { showToast('Please fill all required fields', 'error'); return; }
+        if (teacherStatus === 'Left' && !leavingDate) { showToast('Please select leaving date for a teacher who has left.', 'warning'); return; }
         if (currentEditingTeacherId) {
             const teacher = db.teachers.find(t => t.id === currentEditingTeacherId);
             if (!teacher) { showToast('Teacher not found!', 'error'); return; }
             teacher.name = name; teacher.qualification = qualification || 'N/A'; teacher.subject = subject; teacher.class = teacherClass; teacher.experience = experience; teacher.contact = contact || 'N/A'; teacher.address = address || 'N/A';
-            saveDatabase().then(online => {
-                loadTeachers();
-                closeTeacherModal();
-                showToast(online ? `Teacher "${name}" updated successfully and saved online! ✅` : `Teacher "${name}" saved on this device; online sync will retry.`, online ? 'success' : 'warning');
-            });
+            teacher.joiningDate = joiningDate; teacher.teacherStatus = teacherStatus; teacher.leavingDate = teacherStatus === 'Present' ? '' : leavingDate; teacher.replacementTeacherId = teacherStatus === 'Left' ? replacementTeacherId : '';
+            saveDatabase().then(online => { loadTeachers(); populateReportTeacherFilter(); closeTeacherModal(); showToast(online ? `Teacher "${name}" updated successfully and saved online! ✅` : `Teacher "${name}" saved on this device; online sync will retry.`, online ? 'success' : 'warning'); });
             return;
         }
-        const teacher = { id: 't_' + Math.random().toString(36).substr(2,6), name, qualification: qualification || 'N/A', subject, class: teacherClass, experience, contact: contact || 'N/A', address: address || 'N/A' };
+        const teacher = { id: 't_' + Math.random().toString(36).substr(2,6), name, qualification: qualification || 'N/A', subject, class: teacherClass, experience, contact: contact || 'N/A', address: address || 'N/A', joiningDate, teacherStatus, leavingDate: teacherStatus === 'Present' ? '' : leavingDate, replacementTeacherId: teacherStatus === 'Left' ? replacementTeacherId : '' };
         db.teachers.push(teacher);
-        saveDatabase().then(online => {
-            loadTeachers();
-            closeTeacherModal();
-            showToast(online ? `Teacher "${name}" added and saved online successfully! 🎉` : `Teacher "${name}" saved on this device; online sync will retry.`, online ? 'success' : 'warning');
-        });
+        saveDatabase().then(online => { loadTeachers(); populateReportTeacherFilter(); closeTeacherModal(); showToast(online ? `Teacher "${name}" added and saved online successfully! 🎉` : `Teacher "${name}" saved on this device; online sync will retry.`, online ? 'success' : 'warning'); });
     }
     function deleteTeacher(teacherId) {
         if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can delete teachers', 'error'); return; }
@@ -2411,7 +2420,7 @@
             tr.className = 'border-b border-gray-100 hover:bg-gray-50 transition';
             tr.innerHTML = `
                 <td class="py-3 px-4 font-mono text-xs font-bold">${idx + 1}</td>
-                <td class="py-3 px-4 font-semibold text-gray-800">${student.name}</td>
+                <td class="py-3 px-4 font-semibold text-gray-800">${student.name}<div class="text-[10px] ${student.studentStatus === 'Left' ? 'text-red-600' : 'text-green-600'}">${student.studentStatus || 'Present'}${student.joiningDate ? ' • Join: '+student.joiningDate : ''}${student.leavingDate ? ' • Leave: '+student.leavingDate : ''}</div></td>
                 <td class="py-3 px-4 text-center font-bold text-green-600">${student.present || 0}</td>
                 <td class="py-3 px-4 text-center font-bold text-red-600">${student.absences || 0}</td>
                 <td class="py-3 px-4 text-center font-bold ${attendancePercent >= 80 ? 'text-green-600' : 'text-orange-600'}">${attendancePercent}%</td>
@@ -2874,6 +2883,7 @@
                 <td class="py-3 px-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold ${isPaid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${isPaid ? '✅ Paid' : '⏳ Pending'}</span></td>
                 <td class="py-3 px-4 text-center">
                     <div class="flex items-center justify-center gap-1">
+                        <button onclick="printFeeRecord('${fee.id}')" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded transition"><i class="fa-solid fa-print"></i> Print</button>
                         <button onclick="toggleFeeStatus('${fee.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded transition"><i class="fa-regular fa-rotate"></i> Toggle</button>
                         <button onclick="deleteFee('${fee.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded transition admin-only"><i class="fa-regular fa-trash-can"></i></button>
                     </div>
@@ -2907,7 +2917,7 @@
         const amount = parseInt(document.getElementById('feeAmount').value) || 0;
         const status = document.getElementById('feeStatus').value;
         if (amount <= 0) { showToast('Please enter a valid amount', 'error'); return; }
-        const fee = { id: 'f_' + Math.random().toString(36).substr(2,6), studentId: student.id, studentName: student.name, class: className, month, amount, status };
+        const fee = { id: 'f_' + Math.random().toString(36).substr(2,6), studentId: student.id, studentName: student.name, class: className, month, amount, status, date: new Date().toISOString().slice(0,10) };
         db.fees.push(fee);
         student.feeStatus = status;
         saveDatabase(); loadFees(); closeFeeModal(); showToast(`Tuition fee added for ${student.name} 💰`, 'success');
@@ -2928,6 +2938,25 @@
         const student = db.students[fee.class]?.find(s => s.id === fee.studentId);
         if (student) student.feeStatus = fee.status;
         saveDatabase(); loadFees(); showToast(`Fee status updated for ${fee.studentName}`, 'info');
+    }
+
+    function printFeeRecord(feeId) {
+        if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can print fee records', 'error'); return; }
+        const fee = (db.fees || []).find(f => f.id === feeId);
+        if (!fee) { showToast('Fee record not found!', 'error'); return; }
+        const student = (db.students[fee.class] || []).find(s => s.id === fee.studentId);
+        const joiningDate = student?.joiningDate || 'N/A';
+        const page = `<div class="report-page"><div class="report-header"><h1>🏫 The Educators</h1><h2>Ahmed Haseeb Campus, Mor Kunda</h2><h3>Tuition Fee Receipt</h3></div><div class="report-info-grid"><div><b>Student:</b> ${fee.studentName}</div><div><b>Class:</b> ${fee.class}</div><div><b>Fee Month:</b> ${fee.month || 'N/A'}</div><div><b>Payment Date:</b> ${fee.date || new Date().toLocaleDateString()}</div><div><b>Joining Date:</b> ${joiningDate}</div><div><b>Amount:</b> ₨ ${Number(fee.amount || 0).toLocaleString()}</div><div><b>Status:</b> ${fee.status || 'Pending'}</div><div><b>Class Teacher:</b> ${getClassTeacherName(fee.class)}</div><div><b>Academic Year:</b> ${getAcademicYear()}</div></div><div class="signatures"><div class="sig"><div class="sig-line">Parent / Guardian</div></div><div class="sig"><div class="sig-line">Accounts / Admin</div></div></div><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;
+        printHTML(page);
+    }
+
+    function printLeavingCertificate(className, studentId) {
+        if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can print leaving certificates', 'error'); return; }
+        const student = db.students[className]?.find(s => s.id === studentId);
+        if (!student) { showToast('Student not found!', 'error'); return; }
+        if ((student.studentStatus || 'Present') !== 'Left') { showToast('Set the student status to Left before printing a leaving certificate.', 'warning'); return; }
+        const page = `<div class="report-page"><div class="report-header"><h1>🏫 The Educators</h1><h2>Ahmed Haseeb Campus, Mor Kunda</h2><h3>LEAVING CERTIFICATE</h3></div><div style="font-size:14px;line-height:1.9;margin-top:25px;"><p>This is to certify that <b>${student.name}</b>, Roll No. <b>${student.rollNo || 'N/A'}</b>, Class <b>${className}</b>, son/daughter of <b>${student.father || 'N/A'}</b>, was a student of this institution.</p><div class="report-info-grid" style="margin-top:20px;"><div><b>Date of Birth:</b> ${student.dob || 'N/A'}</div><div><b>Joining Date:</b> ${student.joiningDate || 'N/A'}</div><div><b>Leaving Date:</b> ${student.leavingDate || 'N/A'}</div><div><b>Class Teacher:</b> ${getClassTeacherName(className)}</div><div><b>Academic Year:</b> ${getAcademicYear()}</div><div><b>Student Status:</b> Left</div></div><p style="margin-top:18px;">The student has left the institution and this certificate is issued on request.</p></div><div class="signatures"><div class="sig"><div class="sig-line">Class Teacher</div></div><div class="sig"><div class="sig-line">Principal</div></div></div><div class="footer">Issued on ${new Date().toLocaleDateString()} | The Educators - Ahmed Haseeb Campus</div></div>`;
+        printHTML(page);
     }
 
     // ==================== DELETED ITEMS ====================
@@ -2994,13 +3023,32 @@
         attendanceChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Present', data: presentData, backgroundColor: '#10b981', borderRadius: 4 }, { label: 'Absent', data: absentData, backgroundColor: '#ef4444', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } } }, scales: { x: { stacked: false }, y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
     }
 
+    function populateReportTeacherFilter() {
+        const select = document.getElementById('reportsTeacherFilter');
+        if (!select) return;
+        const current = select.value || 'All';
+        select.innerHTML = '<option value="All">All Teachers</option>' + (db.teachers || []).map(t => `<option value="${t.id}">${t.name} (${t.class || 'N/A'})${t.teacherStatus === 'Left' ? ' - Left' : ''}</option>`).join('');
+        if ([...select.options].some(o => o.value === current)) select.value = current;
+    }
+    function getClassTeacherName(className) {
+        const active = (db.teachers || []).find(t => String(t.class || '') === String(className) && (t.teacherStatus || 'Present') === 'Present');
+        if (active) return active.name;
+        const left = (db.teachers || []).find(t => String(t.class || '') === String(className) && t.replacementTeacherId);
+        if (left) { const replacement = (db.teachers || []).find(t => t.id === left.replacementTeacherId); if (replacement) return replacement.name; }
+        return 'Not Assigned';
+    }
     function getFilteredReportStudents() {
         const classFilter = document.getElementById('reportsClassFilter')?.value || 'All';
+        const teacherFilter = document.getElementById('reportsTeacherFilter')?.value || 'All';
         const search = (document.getElementById('reportsSearchInput')?.value || '').toLowerCase();
         const classList = classFilter === 'All' ? ['PG','Nursery','KG','1','2','3','4','5','6','7'] : [classFilter];
         let allStudents = [];
         classList.forEach(c => { (db.students[c] || []).forEach(s => { allStudents.push({ ...s, className: c }); }); });
-        if (search) allStudents = allStudents.filter(s => s.name.toLowerCase().includes(search));
+        if (teacherFilter !== 'All') {
+            const teacher = (db.teachers || []).find(t => t.id === teacherFilter);
+            if (teacher) allStudents = allStudents.filter(s => String(s.className) === String(teacher.class));
+        }
+        if (search) allStudents = allStudents.filter(s => [s.name, s.className, s.father, s.contact, s.whatsapp].some(v => String(v || '').toLowerCase().includes(search)));
         return allStudents;
     }
 
@@ -3058,11 +3106,6 @@
         const totalDays = (student.present || 0) + (student.absences || 0) || 1;
         const attendancePercent = Math.round(((student.present || 0) / totalDays) * 100);
         return `<div class="report-page"><div class="report-header"><h1>🏫 The Educators</h1><h2>Ahmed Haseeb Campus, Mor Kunda</h2><h3>Student Academic Report</h3></div><div class="report-info-grid"><div><b>Name:</b> ${student.name}</div><div><b>Roll Number:</b> ${student.rollNo || 'N/A'}</div><div><b>Class:</b> ${className}</div><div><b>Class Teacher:</b> ${getClassTeacherName(className)}</div><div><b>Academic Year:</b> ${getAcademicYear()}</div><div><b>Gender:</b> ${student.gender || 'N/A'}</div><div><b>Date of Birth:</b> ${student.dob || 'N/A'}</div><div><b>Father's Name:</b> ${student.father || 'N/A'}</div><div><b>Contact:</b> ${student.contact || 'N/A'}</div><div><b>WhatsApp:</b> ${student.whatsapp || 'N/A'}</div><div><b>Blood Group:</b> ${student.bloodGroup || 'N/A'}</div><div><b>Address:</b> ${student.address || 'N/A'}</div><div><b>Attendance:</b> ${attendancePercent}% (${student.present || 0} present / ${student.absences || 0} absent)</div></div><table class="report-table"><thead><tr><th style="text-align:left;">Subject</th><th>Total Marks</th><th>Obtained Marks</th><th>Percentage</th><th>Grade</th></tr></thead><tbody>${marksHTML}<tr style="background:#eff6ff;font-weight:bold;"><td style="text-align:right;">Grand Total:</td><td>${grandTotal}</td><td>${grandObtained}</td><td>${overallPct}%</td><td style="color:${overallGrade.color.replace('text-', '')}">${overallGrade.label}</td></tr></tbody></table><div style="margin-bottom:15px;"><span style="font-weight:bold;">Fee Status: </span><span class="fee-status ${student.feeStatus === 'Paid' ? 'fee-paid' : student.feeStatus === 'Partial' ? 'fee-partial' : 'fee-pending'}">${student.feeStatus || 'Pending'}</span></div><div class="signatures"><div class="sig"><div class="sig-line">Class Teacher</div></div><div class="sig"><div class="sig-line">Principal</div></div></div><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;
-    }
-
-    function getClassTeacherName(className) {
-        const teacher = (db.teachers || []).find(t => String(t.class || '') === String(className));
-        return teacher ? teacher.name : 'Not Assigned';
     }
 
     function printSingleStudent(className, studentId) {
@@ -3138,6 +3181,86 @@
         printHTML(page);
     }
 
+    function getAllReportStudentsForPrint() {
+        const classList = ['PG','Nursery','KG','1','2','3','4','5','6','7'];
+        const students = [];
+        classList.forEach(className => {
+            (db.students[className] || []).forEach(student => {
+                students.push({ ...student, className: className });
+            });
+        });
+        return students;
+    }
+
+    function populateReportPrintStudentSelect() {
+        const select = document.getElementById('reportPrintStudentSelect');
+        if (!select) return;
+        select.innerHTML = '<option value="">Select a student</option>';
+        const students = getAllReportStudentsForPrint();
+        students.forEach((student, index) => {
+            const option = document.createElement('option');
+            option.value = String(index);
+            const idText = student.id ? `ID: ${student.id}` : '';
+            const rollText = student.rollNo !== undefined && student.rollNo !== null && String(student.rollNo) !== '' ? `Roll: ${student.rollNo}` : '';
+            const details = [idText, rollText, `Class: ${student.className}`].filter(Boolean).join(' | ');
+            option.textContent = `${student.name || 'Unnamed Student'}${details ? ' — ' + details : ''}`;
+            select.appendChild(option);
+        });
+    }
+
+    function openReportPrintSelection() {
+        if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can print filtered reports', 'error'); return; }
+        populateReportPrintStudentSelect();
+        const mode = document.getElementById('reportPrintMode');
+        const select = document.getElementById('reportPrintStudentSelect');
+        if (!mode || !select) { printAllFilteredReports(); return; }
+        mode.value = 'all';
+        select.value = '';
+        select.disabled = true;
+        document.getElementById('reportPrintSelectionModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReportPrintSelection() {
+        const modal = document.getElementById('reportPrintSelectionModal');
+        if (modal) modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function toggleReportPrintStudentSelect() {
+        const mode = document.getElementById('reportPrintMode');
+        const select = document.getElementById('reportPrintStudentSelect');
+        if (!mode || !select) return;
+        select.disabled = mode.value !== 'single';
+        if (select.disabled) select.value = '';
+    }
+
+    function confirmReportPrint() {
+        if (currentUser && currentUser.role === 'Teacher') {
+            closeReportPrintSelection();
+            showToast('Only admin can print filtered reports', 'error');
+            return;
+        }
+
+        const mode = document.getElementById('reportPrintMode')?.value || 'all';
+
+        if (mode === 'single') {
+            const selectedIndex = document.getElementById('reportPrintStudentSelect')?.value || '';
+            if (selectedIndex === '') { showToast('Please select a student to print', 'warning'); return; }
+
+            const students = getAllReportStudentsForPrint();
+            const student = students[Number(selectedIndex)];
+            if (!student) { showToast('Student not found!', 'error'); return; }
+
+            closeReportPrintSelection();
+            printHTML(buildStudentReportPage(student, student.className));
+            return;
+        }
+
+        closeReportPrintSelection();
+        printAllFilteredReports();
+    }
+
     function printAllFilteredReports() {
         if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can print filtered reports', 'error'); return; }
         const students = getFilteredReportStudents();
@@ -3201,7 +3324,7 @@
     // ==================== DATA EXPORT/IMPORT ====================
     function exportData() { if (currentUser?.role === 'Teacher') { showToast('Only admin can export data', 'error'); return; } const dataStr = JSON.stringify(db, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `school_data_${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url); showToast('Data exported successfully! 📥', 'success'); }
     function importData() { if (currentUser?.role === 'Teacher') { showToast('Only admin can import data', 'error'); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { try { const data = JSON.parse(event.target.result); if (data.students && data.teachers !== undefined) { db = data; if (!db.subjects) db.subjects = {}; if (!db.attendanceMarkedDates) db.attendanceMarkedDates = {}; if (!db.deleted) db.deleted = []; if (!db.fees) db.fees = []; if (!db.exams) db.exams = []; if (!db.examResults) db.examResults = {}; if (!db.notices) db.notices = []; migrateSubjectsToObjects(); migrateStudentRollNumbers(); saveDatabase(); loadStudents(); loadTeachers(); loadSubjects(); loadAttendance(); loadFees(); loadExams(); loadDeletedItems(); loadPerformance(); loadNotices(); showToast('Data imported successfully! 📤', 'success'); } else { showToast('Invalid data format!', 'error'); } } catch(err) { showToast('Error reading file!', 'error'); } }; reader.readAsText(file); }; input.click(); }
-    function resetData() { if (currentUser?.role === 'Teacher') { showToast('Only admin can reset data', 'error'); return; } if (confirm('⚠️ This will reset ALL data. Are you sure?')) { AppStorage.remove('school_db_v10'); createDefaultData(); loadStudents(); loadTeachers(); loadSubjects(); loadAttendance(); loadFees(); loadExams(); loadDeletedItems(); updateStats(); loadNotices(); showToast('Data reset to default', 'info'); } }
+    function resetData() { if (currentUser?.role === 'Teacher') { showToast('Only admin can reset data', 'error'); return; } if (confirm('⚠️ This will reset ALL data. Are you sure?')) { createDefaultData(); loadStudents(); loadTeachers(); loadSubjects(); loadAttendance(); loadFees(); loadExams(); loadDeletedItems(); updateStats(); loadNotices(); showToast('Data reset to default', 'info'); } }
 
     // ==================== SETTINGS ====================
     function saveSettings() { if (currentUser?.role === 'Teacher') { showToast('Only admin can save settings', 'error'); return; } AppStorage.set('school_name', document.getElementById('schoolName').value); AppStorage.set('academic_year', document.getElementById('academicYear').value); AppStorage.set('default_fee', document.getElementById('defaultFee').value); showToast('Settings saved successfully! ✅', 'success'); }
@@ -3396,8 +3519,7 @@
         if (academicYear) document.getElementById('academicYear').value = academicYear;
         if (defaultFee) document.getElementById('defaultFee').value = defaultFee;
         loadUsersFromStorage();
-        // Retry any complete database snapshot that could not reach Google Sheets.
-        setTimeout(() => { retryPendingOnlineSync(); }, 1200);
+        // ONLINE-ONLY MODE: no offline database queue/retry is used.
         const firstUser = Object.keys(USERS)[0];
         document.getElementById('registeredEmailDisplay').textContent = USERS[firstUser].email;
     });
@@ -3423,6 +3545,49 @@
         setTimeout(retryPendingOnlineSync, 1200);
     });
 
+</script>
+
+<!-- Reports print student selection: only selects which existing report page(s) are printed. -->
+<div id="reportPrintSelectionModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
+    <div class="modal-content bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 relative">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-print mr-2"></i> Print Report</h2>
+            <button onclick="closeReportPrintSelection()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">×</button>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs text-gray-500 font-bold uppercase block mb-1">Student Selection</label>
+                <select id="reportPrintMode" onchange="toggleReportPrintStudentSelect()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option value="all">All Students</option>
+                    <option value="single">Single Student</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Student</label>
+                <select id="reportPrintStudentSelect" disabled class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none disabled:opacity-60">
+                    <option value="">Select a student</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeReportPrintSelection()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xs px-4 py-2 rounded-xl transition">Cancel</button>
+                <button onclick="confirmReportPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-1">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('reportPrintSelectionModal');
+            if (modal && !modal.classList.contains('hidden')) closeReportPrintSelection();
+        }
+    });
 </script>
 
 </body></html>
