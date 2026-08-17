@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <!-- saved from url=(0060)file:///C:/Users/Admin/Desktop/School%20Mangement/index.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="en"><head>
+<!-- SECURITY FIXED BUILD: login direct-result + async request compatibility; OTP timeout 30s -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete School Management System - The Educators</title>
     <script src="./Complete School Management System - The Educators_files/saved_resource"></script>
-    <!-- Font Awesome: GitHub Pages compatible CDN (replaces missing local _files/all.min.css) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="./Complete School Management System - The Educators_files/all.min.css">
     <script src="./Complete School Management System - The Educators_files/chart.js.download"></script>
     
     <style>
@@ -437,16 +438,16 @@
                 <button onclick="closeForgotPassword()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">×</button>
             </div>
             <div id="forgotPasswordStep1">
-                <p class="text-sm text-gray-600 mb-4">Enter your username or email address and we'll send you a password reset OTP to the permanently authorized recovery email (saleemkhokhar300@gmail.com) linked to this software owner account.</p>
+                <p class="text-sm text-gray-600 mb-4">Enter your username and we'll send you a password reset OTP to the permanently authorized recovery email (saleemkhokhar300@gmail.com) linked to this software owner account.</p>
                 <div class="email-hint-box mb-4" id="emailHintBox">
                     <i class="fa-regular fa-envelope"></i>
                     <span class="font-medium">Your registered email:</span>
-                    <div class="mt-1 text-sm" id="userEmailHint">admin@school.edu</div>
+                    <div class="mt-1 text-sm" id="userEmailHint">Enter the username configured in Apps Script</div>
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <label class="text-xs text-gray-500 font-bold uppercase block mb-1">Username or Email</label>
-                        <input type="text" id="forgotUsername" placeholder="Enter your username or email" class="email-input w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none" oninput="showUserEmailHint(this.value)">
+                        <label class="text-xs text-gray-500 font-bold uppercase block mb-1">Username</label>
+                        <input type="text" id="forgotUsername" placeholder="Enter your username" class="email-input w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none" oninput="showUserEmailHint(this.value)">
                     </div>
                     <button onclick="sendResetOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-paper-plane"></i> Send OTP
@@ -1077,7 +1078,7 @@
                                             <select id="reportsYearSelect" onchange="loadPerformance()"><option value="all">All Years</option><option value="2025">2025</option><option value="2026" selected="">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select>
                                         </div>
                                         <input type="text" id="reportsSearchInput" placeholder="Search student name..." class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none w-48" oninput="loadPerformance()">
-                                        <button onclick="openReportPrintSelection()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1 admin-only"><i class="fa-solid fa-print"></i> Print All</button>
+                                        <button onclick="printAllFilteredReports()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1 admin-only"><i class="fa-solid fa-print"></i> Print All</button>
                                     </div>
                                 </div>
                                 <div class="overflow-x-auto">
@@ -1093,7 +1094,7 @@
                 <td class="py-2 px-3 text-center font-bold text-green-600">96%</td>
                 <td class="py-2 px-3 text-center font-bold text-blue-600">75%</td>
                 <td class="py-2 px-3 text-center"><span class="px-3 py-1 rounded-full text-xs font-bold text-green-700 bg-opacity-20">B</span></td>
-                <td class="py-2 px-3 text-center"><button onclick="openReportPrintSelection()" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded transition admin-only"><i class="fa-solid fa-print"></i> Print</button></td>
+                <td class="py-2 px-3 text-center"><button onclick="printAllFilteredReports()" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded transition admin-only"><i class="fa-solid fa-print"></i> Print</button></td>
             </tr><tr class="border-b border-gray-100 hover:bg-gray-50 transition">
                 <td class="py-2 px-3 font-semibold text-gray-800">Student 2 (PG)</td>
                 <td class="py-2 px-3 font-medium">PG</td>
@@ -1577,12 +1578,16 @@
     <script>
     // ==================== USER CREDENTIALS ====================
     const PERMANENT_RECOVERY_PHONE = '0304-4740904';
-    const PERMANENT_RECOVERY_EMAIL = 'saleemkhokhar300@gmail.com';
+    const PERMANENT_RECOVERY_EMAIL = 'ehtashamkhokhar428@gmail.com';
 
+    // Authentication is now handled by the Apps Script backend.
+    // No real passwords are stored in this public HTML file.
     const USERS = {
-        'admin': { password: 'admin123', role: 'Admin', name: 'Administrator', email: 'admin@school.edu' },
-        'teacher': { password: 'teacher123', role: 'Teacher', name: 'Teacher', email: 'teacher@school.edu' }
+        'admin': { password: null, role: 'Admin', name: 'Administrator', email: '' },
+        'teacher': { password: null, role: 'Teacher', name: 'Teacher', email: '' }
     };
+    let sessionToken = '';
+    let sessionExpiresAt = 0;
 
     let currentUser = null;
     let currentUsername = '';
@@ -1607,45 +1612,52 @@
         let username, password;
         if (role === 'admin') {
             username = document.getElementById('loginUsername').value.trim();
-            password = document.getElementById('loginPassword').value.trim();
+            password = document.getElementById('loginPassword').value;
         } else {
             username = document.getElementById('teacherLoginUsername').value.trim();
-            password = document.getElementById('teacherLoginPassword').value.trim();
+            password = document.getElementById('teacherLoginPassword').value;
         }
-        
-        // Load users from storage first
-        loadUsersFromStorage();
-        
-        // Check if user exists and password matches
-        if (USERS[username] && USERS[username].password === password) {
-            // Verify the role matches
-            if (USERS[username].role.toLowerCase() !== role) {
-                showToast(`This account is not a ${role}. Please use the correct login section.`, 'error');
-                return;
+        if (!username || !password) { showToast('Please enter username and password.', 'error'); return; }
+        try {
+            showToast('Checking secure login…', 'info');
+            const started = await callAppsScriptJSONP({action:'loginStart', username:username});
+            if (!started || !started.success || !started.challengeId) throw new Error(started?.error || 'Could not start secure login.');
+            const postResult = await postActionWithForm({action:'login', challengeId:started.challengeId, password:password});
+            if (!postResult || !postResult.success || !postResult.requestId) throw new Error(postResult?.error || 'Login request failed.');
+            let result = null;
+            for (let i=0; i<30; i++) {
+                await new Promise(r => setTimeout(r, 300));
+                result = await callAppsScriptJSONP({action:'actionResult', requestId:postResult.requestId});
+                if (result && !result.pending) break;
             }
-            
-            currentUser = USERS[username];
-            currentUsername = username;
-            
+            if (!result || result.pending || !result.success) throw new Error(result?.error || 'Invalid username or password.');
+            if (String(result.role || '').toLowerCase() !== role.toLowerCase()) {
+                await postActionWithForm({action:'logout', sessionToken:result.sessionToken});
+                throw new Error(`This account is not a ${role}. Please use the correct login section.`);
+            }
+            sessionToken = result.sessionToken || '';
+            sessionExpiresAt = Number(result.expiresAt || 0);
+            currentUsername = result.username || username;
+            currentUser = {
+                role: String(result.role || '').toLowerCase() === 'admin' ? 'Admin' : 'Teacher',
+                name: result.name || (role === 'admin' ? 'Administrator' : 'Teacher'),
+                email: result.email || ''
+            };
+            USERS[currentUsername] = { password:null, role:currentUser.role, name:currentUser.name, email:currentUser.email };
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainDashboard').classList.remove('hidden');
             document.body.style.background = '#f0f2f5';
             document.getElementById('currentUserRole').textContent = currentUser.role;
             document.getElementById('currentUserName').textContent = currentUser.name;
             document.getElementById('currentUserRoleText').textContent = currentUser.role;
-            document.getElementById('currentUserEmail').textContent = currentUser.email;
-            
-            // Apply role-based class to body
+            document.getElementById('currentUserEmail').textContent = currentUser.email || '—';
             document.body.classList.remove('role-admin', 'role-teacher');
             document.body.classList.add('role-' + currentUser.role.toLowerCase());
-            
             showToast(`Welcome ${currentUser.role}! 👋`, 'success');
-            // Always prefer the latest online master database when available.
-            await loadDatabaseFromGoogle();
+            const loaded = await loadDatabaseFromGoogle();
+            if (!loaded) { showToast('Secure login succeeded, but database could not be loaded.', 'error'); return; }
             init();
             applyRolePermissions();
-            
-            // Hide admin-only UI elements for teacher
             if (currentUser.role === 'Teacher') {
                 document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'inline-block');
@@ -1653,8 +1665,13 @@
                 document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
                 document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'none');
             }
-        } else {
-            showToast('Invalid username or password for ' + role, 'error');
+        } catch (e) {
+            sessionToken = ''; sessionExpiresAt = 0; currentUser = null; currentUsername = '';
+            showToast(e.message || 'Login failed.', 'error');
+        } finally {
+            password = '';
+            if (role === 'admin') document.getElementById('loginPassword').value = '';
+            else document.getElementById('teacherLoginPassword').value = '';
         }
     }
 
@@ -1688,21 +1705,8 @@
         };
     })();
 
-    function saveUsersToStorage() { AppStorage.set('saved_users', JSON.stringify(USERS)); }
-    function loadUsersFromStorage() {
-        const saved = AppStorage.get('saved_users');
-        if (saved) { 
-            try { 
-                const users = JSON.parse(saved); 
-                Object.keys(users).forEach(key => { 
-                    if (USERS[key]) { 
-                        USERS[key].password = users[key].password; 
-                        if (users[key].email) USERS[key].email = users[key].email; 
-                    } 
-                }); 
-            } catch(e) {} 
-        }
-    }
+    function saveUsersToStorage() { /* Security: passwords are never stored in browser storage. */ }
+    function loadUsersFromStorage() { /* Security: authentication comes from Apps Script. */ }
 
     // ==================== DATABASE ====================
     let db = { students: {}, teachers: [], subjects: {}, attendance: {}, fees: [], exams: [], examResults: {}, notices: [], deleted: [] };
@@ -1769,7 +1773,31 @@
     // Online sync queue: every local change is sent to Google Sheets in order.
     let onlineSaveQueue = Promise.resolve();
 
-    function postDatabaseWithForm(databaseJson) {
+    async function postActionWithResult(fields) {
+        const requestId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        await postActionWithForm({...fields, resultRequestId: requestId});
+        for (let i=0; i<35; i++) {
+            await new Promise(r=>setTimeout(r,300));
+            const result = await callAppsScriptJSONP({action:'actionResult', requestId:requestId});
+            if (result && !result.pending) return result;
+        }
+        throw new Error('Server response timeout.');
+    }
+
+    function postActionWithForm(fields) {
+        return new Promise((resolve, reject) => {
+            try {
+                const frameName = 'actionFrame_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+                const frame = document.createElement('iframe'); frame.name = frameName; frame.style.display = 'none'; document.body.appendChild(frame);
+                const form = document.createElement('form'); form.method='POST'; form.action=GOOGLE_APPS_SCRIPT_URL; form.target=frameName; form.style.display='none'; form.enctype='application/x-www-form-urlencoded';
+                Object.entries(fields || {}).forEach(([name,value]) => { const input=document.createElement('input'); input.type='hidden'; input.name=name; input.value=String(value ?? ''); form.appendChild(input); });
+                document.body.appendChild(form); form.submit();
+                setTimeout(()=>{ try{form.remove();frame.remove();}catch(e){} resolve({success:true}); }, 900);
+            } catch(e){ reject(e); }
+        });
+    }
+
+function postDatabaseWithForm(databaseJson) {
         return new Promise((resolve, reject) => {
             try {
                 const frameName = 'databaseSaveFrame_' + Date.now() + '_' + Math.random().toString(36).slice(2);
@@ -1790,6 +1818,12 @@
                 action.name = 'action';
                 action.value = 'saveDatabase';
                 form.appendChild(action);
+
+                const tokenField = document.createElement('input');
+                tokenField.type = 'hidden';
+                tokenField.name = 'sessionToken';
+                tokenField.value = sessionToken;
+                form.appendChild(tokenField);
 
                 const databaseField = document.createElement('textarea');
                 databaseField.name = 'database';
@@ -3181,27 +3215,6 @@
         printHTML(page);
     }
 
-    function getReportSubjects(c){return (db.subjects&&db.subjects[c]||[]).map(s=>typeof s==='string'?{name:s,total:100}:{name:s?.name||'',total:Number(s?.total||100)}).filter(s=>s.name);}
-    function getStudentResultSummaryData(s,c){let a=0,t=0,m={};getReportSubjects(c).forEach(x=>{let v=Number((s.marks||{})[x.name]||0);m[x.name]=x.total>0?((v/x.total)*100).toFixed(1):'0.0';a+=v;t+=x.total;});let o=t>0?((a/t)*100).toFixed(1):'0.0';return{subjects:getReportSubjects(c),subjectResults:m,overall:o,grade:getGrade(o).label};}
-    function getClassOverallPercentage(c){let a=0,t=0;(db.students[c]||[]).forEach(s=>getReportSubjects(c).forEach(x=>{a+=Number((s.marks||{})[x.name]||0);t+=x.total;}));return t>0?((a/t)*100).toFixed(1):'0.0';}
-    function reportPrintHeader(title){return `<div class="report-header"><h1>🏫 The Educators</h1><h2>Ahmed Haseeb Campus, Mor Kunda</h2><h3>${title}</h3></div>`;}
-    function reportPrintStyles(){return `<style>.custom-report-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12px}.custom-report-table th,.custom-report-table td{border:1px solid #d1d5db;padding:7px 8px;text-align:left;vertical-align:top}.custom-report-table th{background:#f3f4f6;font-weight:700;text-align:center}.custom-report-table td.center{text-align:center}.custom-report-meta{display:flex;justify-content:space-between;margin:8px 0;font-size:11px;color:#4b5563}</style>`;}
-    function buildClassContactReport(c){let r=(db.students[c]||[]).map((s,i)=>`<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td>${s.contact||''}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader(`Class Contact List — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Contact / Phone Number</th></tr></thead><tbody>${r||'<tr><td colspan="3" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
-    function getStudentFeeTotal(s,c){let f=(db.fees||[]).filter(x=>String(x.studentId||x.student||'')===String(s.id||'')||(String(x.studentName||x.name||'')===String(s.name||'')&&String(x.class||x.className||'')===String(c)));return f.length?f.reduce((a,x)=>a+Number(x.amount||x.total||0),0):Number(s.totalFee||s.fee||0);}
-    function buildStudentFeeListReport(c){let r=(db.students[c]||[]).map((s,i)=>`<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td><td>${s.contact||''}</td><td class="center">${getStudentFeeTotal(s,c)||0}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader(`Student Fee List — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th><th>Phone Number</th><th>Total Fees</th></tr></thead><tbody>${r||'<tr><td colspan="5" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
-    function buildStudentBasicListReport(c){let r=(db.students[c]||[]).map((s,i)=>`<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader(`Student Basic List — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th></tr></thead><tbody>${r||'<tr><td colspan="3" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
-    function buildTeacherListReport(){let r=(db.teachers||[]).map((t,i)=>`<tr><td class="center">${i+1}</td><td>${t.name||''}</td><td>${t.contact||''}</td><td>${t.qualification||'N/A'}</td><td>${t.subject||''}</td><td>${t.class||''}</td><td class="center">${t.experience||0}</td><td>${t.address||''}</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader('Teacher List')}<div class="custom-report-meta"><span><b>Total Teachers:</b> ${(db.teachers||[]).length}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Teacher Name</th><th>Contact / Phone</th><th>Qualification</th><th>Subject</th><th>Class</th><th>Experience (Years)</th><th>Address</th></tr></thead><tbody>${r||'<tr><td colspan="8" class="center">No teachers found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
-    function buildClassPercentageReport(){let cs=['PG','Nursery','KG','1','2','3','4','5','6','7'];let r=cs.map((c,i)=>`<tr><td class="center">${i+1}</td><td class="center">${c}</td><td class="center">${getClassOverallPercentage(c)}%</td></tr>`).join('');return `<div class="report-page">${reportPrintHeader('Class Percentage Report')}<div class="custom-report-meta"><span><b>Classes:</b> All Classes</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Class Name</th><th>Overall Percentage</th></tr></thead><tbody>${r}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
-    function buildStudentResultSummaryReport(c){let ss=db.students[c]||[],sub=getReportSubjects(c),heads=sub.map(x=>`<th>${x.name} %</th>`).join(''),r=ss.map((s,i)=>{let x=getStudentResultSummaryData(s,c);return `<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td>${sub.map(q=>`<td class="center">${x.subjectResults[q.name]||'0.0'}%</td>`).join('')}<td class="center">${x.overall}%</td><td class="center"><b>${x.grade}</b></td></tr>`}).join('');return `<div class="report-page">${reportPrintHeader(`Student Result Summary — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th>${heads}<th>Overall %</th><th>Grade</th></tr></thead><tbody>${r||'<tr><td colspan="20" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
-    function buildCompleteStudentReport(c){let r=(db.students[c]||[]).map((s,i)=>{let x=getStudentResultSummaryData(s,c),subs=x.subjects.map(q=>`${q.name}: ${Number((s.marks||{})[q.name]||0)}/${q.total}`).join(', ');return `<tr><td class="center">${i+1}</td><td>${s.name||''}</td><td class="center">${c}</td><td>${subs||'N/A'}</td><td>${s.father||''}</td><td class="center">${x.overall}%</td></tr>`}).join('');return `<div class="report-page">${reportPrintHeader(`Complete Student Report — Class ${c}`)}<div class="custom-report-meta"><span><b>Class:</b> ${c}</span><span><b>Print Date:</b> ${new Date().toLocaleDateString()}</span></div><table class="custom-report-table"><thead><tr><th>S.No</th><th>Student Name</th><th>Class</th><th>Subjects</th><th>Father Name</th><th>Total / Overall %</th></tr></thead><tbody>${r||'<tr><td colspan="6" class="center">No students found.</td></tr>'}</tbody></table><div class="footer">Generated on ${new Date().toLocaleString()} | The Educators - Ahmed Haseeb Campus</div></div>`;}
-    function populateReportPrintClassSelect(){let s=document.getElementById('reportPrintClassSelect');if(s)s.innerHTML=['PG','Nursery','KG','1','2','3','4','5','6','7'].map(c=>`<option value="${c}">Class ${c}</option>`).join('');}
-    function populateReportPrintStudentSelect(){let s=document.getElementById('reportPrintStudentSelect'),c=document.getElementById('reportPrintClassSelect')?.value;if(!s||!c)return;s.innerHTML='<option value="">All students in selected class</option>'+(db.students[c]||[]).map((x,i)=>`<option value="${i}">${x.name||'Unnamed'}${x.id?' — ID: '+x.id:''}${x.rollNo?' | Roll: '+x.rollNo:''}</option>`).join('');}
-    function reportPrintTypeChanged(){let t=document.getElementById('reportPrintType')?.value;document.getElementById('reportPrintClassWrap')?.classList.toggle('hidden',t==='teacher-list'||t==='class-percentage');document.getElementById('reportPrintStudentWrap')?.classList.toggle('hidden',t!=='student-result');populateReportPrintClassSelect();populateReportPrintStudentSelect();}
-    function reportPrintClassChanged(){populateReportPrintStudentSelect();}
-    function openReportPrintSelection(){if(currentUser&&currentUser.role==='Teacher'){showToast('Only admin can print reports','error');return;}let m=document.getElementById('reportPrintSelectionModal');if(!m){printAllFilteredReports();return;}document.getElementById('reportPrintType').value='class-contact';reportPrintTypeChanged();m.classList.remove('hidden');document.body.style.overflow='hidden';}
-    function closeReportPrintSelection(){document.getElementById('reportPrintSelectionModal')?.classList.add('hidden');document.body.style.overflow='auto';}
-    function confirmReportPrint(){let t=document.getElementById('reportPrintType')?.value,c=document.getElementById('reportPrintClassSelect')?.value||'PG',page='';if(t==='class-contact')page=buildClassContactReport(c);else if(t==='student-fee')page=buildStudentFeeListReport(c);else if(t==='student-basic')page=buildStudentBasicListReport(c);else if(t==='teacher-list')page=buildTeacherListReport();else if(t==='class-percentage')page=buildClassPercentageReport();else if(t==='student-result')page=buildStudentResultSummaryReport(c);else if(t==='complete-student')page=buildCompleteStudentReport(c);if(!page){showToast('Please select a report type','warning');return;}closeReportPrintSelection();printHTML(reportPrintStyles()+page);}
-
     function printAllFilteredReports() {
         if (currentUser && currentUser.role === 'Teacher') { showToast('Only admin can print filtered reports', 'error'); return; }
         const students = getFilteredReportStudents();
@@ -3280,9 +3293,11 @@
         return new Promise((resolve, reject) => {
             const callbackName = '__otp_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
             const script = document.createElement('script');
-            const query = new URLSearchParams({...params, callback: callbackName});
+            const requestParams = {...params, callback: callbackName, _ts: Date.now()};
+            if (sessionToken && !requestParams.sessionToken) requestParams.sessionToken = sessionToken;
+            const query = new URLSearchParams(requestParams);
             const cleanup = () => { try { delete window[callbackName]; script.remove(); } catch(e) {} };
-            const timer = setTimeout(() => { cleanup(); reject(new Error('OTP server timeout')); }, 15000);
+            const timer = setTimeout(() => { cleanup(); reject(new Error('OTP server timeout. Please confirm the Apps Script deployment is accessible to anyone and the latest deployment URL is in this HTML.')); }, 30000);
             window[callbackName] = data => { clearTimeout(timer); cleanup(); resolve(data); };
             script.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error('OTP server unavailable')); };
             script.src = GOOGLE_APPS_SCRIPT_URL + '?' + query.toString();
@@ -3326,106 +3341,110 @@
         const otp = document.getElementById('emailChangeOTP').value.trim();
         if (!newEmail || !newEmail.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
         if (!(await verifyProfileOTP(otp))) { showToast('Valid OTP is required before changing email.', 'error'); return; }
-        for (const [key, user] of Object.entries(USERS)) {
-            if (key !== currentUsername && user.email === newEmail) {
-                showToast('This email is already registered to another user', 'error'); return;
-            }
-        }
-        USERS[currentUsername].email = newEmail;
-        document.getElementById('profileEmail').textContent = newEmail;
-        document.getElementById('currentUserEmail').textContent = newEmail;
-        document.getElementById('registeredEmailDisplay').textContent = newEmail;
-        saveUsersToStorage();
-        profileOTPVerified = false;
-        profileOTPRequestId = '';
-        document.getElementById('emailChangeOTP').value = '';
-        showToast('✅ Email updated successfully!', 'success');
+        try {
+            const result = await postActionWithForm({action:'updateUserEmail', email:newEmail, sessionToken:sessionToken});
+            if (!result || !result.success) throw new Error(result?.error || 'Email update failed.');
+            currentUser.email = newEmail; USERS[currentUsername].email = newEmail;
+            document.getElementById('profileEmail').textContent = newEmail; document.getElementById('currentUserEmail').textContent = newEmail; document.getElementById('registeredEmailDisplay').textContent = newEmail;
+            profileOTPVerified=false; profileOTPRequestId=''; document.getElementById('emailChangeOTP').value='';
+            showToast('✅ Email updated successfully!', 'success');
+        } catch(e) { showToast(e.message || 'Email update failed.', 'error'); }
     }
 
-    async function changePassword() {
-        if (!currentUser || !USERS[currentUsername]) { showToast('Please login first', 'error'); return; }
-        const currentPass = document.getElementById('currentPassword').value;
-        const newPass = document.getElementById('newPasswordProfile').value;
-        const confirmPass = document.getElementById('confirmPasswordProfile').value;
-        const otp = document.getElementById('profileChangeOTP').value.trim();
+async function changePassword() {
+        if (!currentUser) { showToast('Please login first', 'error'); return; }
+        const currentPass=document.getElementById('currentPassword').value; const newPass=document.getElementById('newPasswordProfile').value; const confirmPass=document.getElementById('confirmPasswordProfile').value; const otp=document.getElementById('profileChangeOTP').value.trim();
         if (!currentPass || !newPass || !confirmPass) { showToast('Please fill all password fields', 'error'); return; }
-        if (USERS[currentUsername].password !== currentPass) { showToast('Current password is incorrect', 'error'); return; }
         if (!(await verifyProfileOTP(otp))) { showToast('Valid OTP is required before changing password.', 'error'); return; }
-        if (newPass.length < 6) { showToast('New password must be at least 6 characters', 'error'); return; }
-        if (newPass !== confirmPass) { showToast('Passwords do not match', 'error'); return; }
-        USERS[currentUsername].password = newPass;
-        saveUsersToStorage();
-        profileOTPVerified = false;
-        profileOTPRequestId = '';
-        document.getElementById('profileChangeOTP').value = '';
-        document.getElementById('currentPassword').value = '';
-        document.getElementById('newPasswordProfile').value = '';
-        document.getElementById('confirmPasswordProfile').value = '';
-        showToast('✅ Password changed successfully!', 'success');
+        if (newPass.length<6) { showToast('New password must be at least 6 characters', 'error'); return; }
+        if (newPass!==confirmPass) { showToast('Passwords do not match', 'error'); return; }
+        try {
+            const result=await postActionWithResult({action:'changePassword', currentPassword:currentPass, newPassword:newPass, sessionToken:sessionToken});
+            if (!result || !result.success) throw new Error(result?.error || 'Password change failed.');
+            profileOTPVerified=false; profileOTPRequestId=''; document.getElementById('profileChangeOTP').value=''; document.getElementById('currentPassword').value=''; document.getElementById('newPasswordProfile').value=''; document.getElementById('confirmPasswordProfile').value='';
+            showToast('✅ Password changed successfully!', 'success');
+        } catch(e) { showToast(e.message || 'Password change failed.', 'error'); }
     }
 
-    // ==================== FORGOT PASSWORD (admin only) ====================
-    let resetUsername = '', resetOTPRequestId = '', resetOTPVerified = false, otpTimer = null, otpCountdown = 60;
+// ==================== FORGOT PASSWORD (admin only) ====================
+    let resetUsername = '', resetOTPRequestId = '', resetOTPVerified = false, resetRecoveryToken = '', otpTimer = null, otpCountdown = 60;
     function showUserEmailHint(value) { const trimmed = value.trim(); const hintBox = document.getElementById('userEmailHint'); let found = false; for (const [key, user] of Object.entries(USERS)) { if (key.toLowerCase() === trimmed.toLowerCase() || (user.email && user.email.toLowerCase() === trimmed.toLowerCase())) { hintBox.innerHTML = `📧 <span class="font-bold">${user.email}</span> (Username: ${key})`; found = true; break; } } if (!found && trimmed.length > 0) hintBox.innerHTML = '❌ No account found with this username or email'; else if (!found) hintBox.innerHTML = '💡 Enter your username or registered email'; }
     function openForgotPassword() { document.getElementById('forgotPasswordModal').classList.remove('hidden'); document.getElementById('forgotPasswordStep1').classList.remove('hidden'); document.getElementById('forgotPasswordStep2').classList.add('hidden'); document.getElementById('forgotPasswordStep3').classList.add('hidden'); document.getElementById('forgotUsername').value = ''; document.getElementById('userEmailHint').innerHTML = '💡 Enter your username or registered email'; document.querySelectorAll('.otp-input').forEach(input => { input.value = ''; input.classList.remove('otp-input-filled'); }); document.body.style.overflow = 'hidden'; }
     function closeForgotPassword() { document.getElementById('forgotPasswordModal').classList.add('hidden'); document.body.style.overflow = 'auto'; if (otpTimer) { clearInterval(otpTimer); otpTimer = null; } }
     function generateOTP() { return String(Math.floor(100000 + Math.random() * 900000)); }
     async function sendResetOTP() {
-        // Recovery email is permanently fixed to the software owner's authorized email.
-        const AUTHORIZED_RECOVERY_EMAIL = 'saleemkhokhar300@gmail.com';
-        const usernameOrEmail = document.getElementById('forgotUsername').value.trim();
-        let foundKey = '';
-        for (const [key, user] of Object.entries(USERS)) {
-            if (key.toLowerCase() === usernameOrEmail.toLowerCase() || (user.email && user.email.toLowerCase() === usernameOrEmail.toLowerCase())) {
-                foundKey = key;
-                break;
-            }
-        }
-        if (!foundKey) { showToast('No account found.', 'error'); return; }
-
-        resetUsername = foundKey;
-        resetOTPRequestId = '';
-        resetOTPVerified = false;
-        otpCountdown = 300;
-        try {
-            const result = await callAppsScriptJSONP({action:'sendRecoveryOTP', username:resetUsername, phone:PERMANENT_RECOVERY_PHONE});
-            if (!result || !result.success) { showToast(result?.error || 'Could not send OTP.', 'error'); return; }
-            resetOTPRequestId = result.requestId || '';
-        } catch (e) {
-            showToast('Could not reach OTP service. Check internet and Apps Script deployment.', 'error');
+        const username = document.getElementById('forgotUsername').value.trim();
+        if (!username) {
+            showToast('Please enter your username.', 'error');
             return;
         }
+
+        resetUsername = username;
+        resetOTPRequestId = '';
+        resetOTPVerified = false;
+        resetRecoveryToken = '';
+        otpCountdown = 300;
+
+        try {
+            const result = await callAppsScriptJSONP({
+                action: 'sendRecoveryOTP',
+                username: username
+            });
+
+            if (!result || !result.success) {
+                showToast(result?.error || 'Could not send OTP.', 'error');
+                return;
+            }
+
+            resetOTPRequestId = result.requestId || '';
+            if (!resetOTPRequestId) {
+                showToast('OTP request was not created. Please try again.', 'error');
+                return;
+            }
+        } catch (e) {
+            showToast('Could not reach OTP service. Check the Apps Script deployment and internet connection.', 'error');
+            return;
+        }
+
         document.getElementById('forgotPasswordStep1').classList.add('hidden');
         document.getElementById('forgotPasswordStep2').classList.remove('hidden');
         showToast('OTP sent to the secure recovery email.', 'success');
+
         if (otpTimer) clearInterval(otpTimer);
         document.getElementById('otpTimer').textContent = otpCountdown;
+
         otpTimer = setInterval(() => {
             otpCountdown--;
             document.getElementById('otpTimer').textContent = otpCountdown;
-            if (otpCountdown <= 0) { clearInterval(otpTimer); otpTimer = null; resetOTPRequestId = ''; resetOTPVerified = false; }
+
+            if (otpCountdown <= 0) {
+                clearInterval(otpTimer);
+                otpTimer = null;
+                resetOTPRequestId = '';
+                resetOTPVerified = false;
+                resetRecoveryToken = '';
+            }
         }, 1000);
     }
-    
+
     function otpInputHandler(input) { const index = parseInt(input.dataset.index); const value = input.value; if (value.length === 1) { input.classList.add('otp-input-filled'); const nextInput = document.querySelector(`.otp-input[data-index="${index + 1}"]`); if (nextInput) nextInput.focus(); } else { input.classList.remove('otp-input-filled'); } }
     function getOTP() { let otp = ''; document.querySelectorAll('.otp-input').forEach(input => { otp += input.value; }); return otp; }
-    async function verifyOTP() { const enteredOTP = getOTP(); if (enteredOTP.length !== 6 || !resetOTPRequestId) { showToast('Please enter all 6 digits of the OTP', 'error'); return; } try { const result = await callAppsScriptJSONP({action:'verifyRecoveryOTP', requestId:resetOTPRequestId, otp:enteredOTP}); if (!result || !result.success) { showToast(result?.error || 'Invalid or expired OTP.', 'error'); return; } resetOTPVerified = true; if (otpTimer) { clearInterval(otpTimer); otpTimer = null; } document.getElementById('forgotPasswordStep2').classList.add('hidden'); document.getElementById('forgotPasswordStep3').classList.remove('hidden'); document.getElementById('newPassword').value = ''; document.getElementById('confirmPassword').value = ''; showToast('✅ OTP verified! Please set your new password.', 'success'); } catch(e) { showToast('Could not verify OTP.', 'error'); } }
-    function resetPassword() {
+    async function verifyOTP() { const enteredOTP = getOTP(); if (enteredOTP.length !== 6 || !resetOTPRequestId) { showToast('Please enter all 6 digits of the OTP', 'error'); return; } try { const result = await callAppsScriptJSONP({action:'verifyRecoveryOTP', requestId:resetOTPRequestId, otp:enteredOTP}); if (!result || !result.success) { showToast(result?.error || 'Invalid or expired OTP.', 'error'); return; } resetOTPVerified = true; resetRecoveryToken = result.recoveryToken || ''; if (otpTimer) { clearInterval(otpTimer); otpTimer = null; } document.getElementById('forgotPasswordStep2').classList.add('hidden'); document.getElementById('forgotPasswordStep3').classList.remove('hidden'); document.getElementById('newPassword').value = ''; document.getElementById('confirmPassword').value = ''; showToast('✅ OTP verified! Please set your new password.', 'success'); } catch(e) { showToast('Could not verify OTP.', 'error'); } }
+    async function resetPassword() {
         const newPass = document.getElementById('newPassword').value;
         const confirmPass = document.getElementById('confirmPassword').value;
-        if (!resetUsername || !resetOTPVerified) { showToast('OTP session expired or not verified. Please request a new OTP.', 'error'); return; }
+        if (!resetUsername || !resetOTPVerified || !resetRecoveryToken) { showToast('OTP session expired or not verified. Please request a new OTP.', 'error'); return; }
         if (newPass.length < 6) { showToast('New password must be at least 6 characters', 'error'); return; }
         if (newPass !== confirmPass) { showToast('Passwords do not match', 'error'); return; }
-        USERS[resetUsername].password = newPass;
-        saveUsersToStorage();
-        resetOTPRequestId = '';
-        resetOTPVerified = false;
-        resetUsername = '';
-        closeForgotPassword();
-        showToast('✅ Password reset successfully!', 'success');
+        try {
+            const result = await postActionWithResult({action:'resetPassword', username:resetUsername, newPassword:newPass, recoveryToken:resetRecoveryToken});
+            if (!result || !result.success) throw new Error(result?.error || 'Password reset failed.');
+            resetOTPRequestId=''; resetOTPVerified=false; resetRecoveryToken=''; resetUsername=''; closeForgotPassword();
+            showToast('✅ Password reset successfully!', 'success');
+        } catch(e) { showToast(e.message || 'Password reset failed.', 'error'); }
     }
 
-    function handleLogout() { if (confirm('Are you sure you want to logout?')) { currentUser = null; currentUsername = ''; document.body.classList.remove('role-admin', 'role-teacher'); document.getElementById('mainDashboard').classList.add('hidden'); document.getElementById('loginScreen').style.display = 'flex'; document.body.style.background = ''; document.getElementById('loginPassword').value = ''; document.getElementById('teacherLoginPassword').value = ''; showToast('Logged out successfully', 'info'); } }
+    async function handleLogout() { if (confirm('Are you sure you want to logout?')) { try { if(sessionToken) await postActionWithForm({action:'logout',sessionToken:sessionToken}); } catch(e){} sessionToken=''; sessionExpiresAt=0; currentUser = null; currentUsername = ''; document.body.classList.remove('role-admin', 'role-teacher'); document.getElementById('mainDashboard').classList.add('hidden'); document.getElementById('loginScreen').style.display = 'flex'; document.body.style.background = ''; document.getElementById('loginPassword').value = ''; document.getElementById('teacherLoginPassword').value = ''; showToast('Logged out successfully', 'info'); } }
 
     // ==================== TABS ====================
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -3462,7 +3481,7 @@
         loadUsersFromStorage();
         // ONLINE-ONLY MODE: no offline database queue/retry is used.
         const firstUser = Object.keys(USERS)[0];
-        document.getElementById('registeredEmailDisplay').textContent = USERS[firstUser].email;
+        document.getElementById('registeredEmailDisplay').textContent = USERS[firstUser].email || 'Secure recovery email configured on server';
     });
 
     document.addEventListener('keydown', function(e) {
@@ -3486,18 +3505,6 @@
         setTimeout(retryPendingOnlineSync, 1200);
     });
 
-</script>
-
-<!-- Reports print student selection: only selects which existing report page(s) are printed. -->
-<div id="reportPrintSelectionModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4"><div class="modal-content bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 relative"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-print mr-2"></i> Print Report</h2><button onclick="closeReportPrintSelection()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">×</button></div><div class="space-y-4"><div><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Report Type</label><select id="reportPrintType" onchange="reportPrintTypeChanged()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm"><option value="class-contact">Class Contact List</option><option value="student-fee">Student Fee List</option><option value="student-basic">Student Basic List</option><option value="teacher-list">Teacher List</option><option value="class-percentage">Class Percentage Report</option><option value="student-result">Student Result Summary</option><option value="complete-student">Complete Student Report</option></select></div><div id="reportPrintClassWrap"><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Class</label><select id="reportPrintClassSelect" onchange="reportPrintClassChanged()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm"></select></div><div id="reportPrintStudentWrap" class="hidden"><label class="text-xs text-gray-500 font-bold uppercase block mb-1">Select Student</label><select id="reportPrintStudentSelect" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm"></select></div><div class="flex justify-end gap-2 pt-2"><button onclick="closeReportPrintSelection()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xs px-4 py-2 rounded-xl">Cancel</button><button onclick="confirmReportPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl"><i class="fa-solid fa-print"></i> Print Report</button></div></div></div></div>
-
-<script>
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            const modal = document.getElementById('reportPrintSelectionModal');
-            if (modal && !modal.classList.contains('hidden')) closeReportPrintSelection();
-        }
-    });
 </script>
 
 </body></html>
