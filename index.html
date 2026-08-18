@@ -3505,55 +3505,6 @@ async function changePassword() {
         setTimeout(retryPendingOnlineSync, 1200);
     });
 
-<script>
-// ==========================================
-// AUTOMATIC FIXED AND VERIFIED SYSTEM CODE
-// ==========================================
-const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwzb5Ml_iWH8vHlsUeGlvwiNoyBX49toLLHV4CxNcbtnj6mNuENy3nuyI0AmN-aF7zQeg/exec";
-
-function handleLoginRequest(role) {
-    let uField = role === 'admin' ? 'adminUsername' : 'teacherUsername';
-    let pField = role === 'admin' ? 'adminPassword' : 'teacherPassword';
-    
-    let username = document.getElementById(uField)?.value || role;
-    let password = document.getElementById(pField)?.value || role;
-
-    // Direct dashboard authentication check to prevent OTP server block
-    if (username === role && password === role) {
-        alert(role.toUpperCase() + " Login Successful (System Verified)!");
-        if(document.querySelector('.login-container')) {
-            document.querySelector('.login-container').style.setProperty('display', 'none', 'important');
-        }
-        if(document.querySelector('#mainDashboard')) {
-            document.querySelector('#mainDashboard').style.setProperty('display', 'block', 'important');
-        }
-        return false;
-    } else {
-        alert("Invalid Username or Password!");
-    }
-}
-
-function submitFormToSheet(actionType, payload) {
-    payload.action = actionType;
-    alert("Sending data to secure Google Sheet... Please wait.");
-    
-    fetch(GOOGLE_API_URL, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status === "success") {
-            alert("Data Updated in Google Sheet Successfully!");
-            window.location.reload();
-        } else {
-            alert("Server Data Saved!");
-        }
-    })
-    .catch(err => {
-        alert("Data Sync Pending. Connection active.");
-    });
-}
 </script>
+
+</body></html>
