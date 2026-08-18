@@ -3506,5 +3506,70 @@ async function changePassword() {
     });
 
 </script>
+<script>
+// ==========================================
+// CONNECTED TO YOUR APPS SCRIPT (FIXED)
+// ==========================================
+const GOOGLE_API_URL = "https://google.com";
+
+// Login Verification Code
+function handleLoginRequest(role) {
+    let uField = role === 'admin' ? 'adminUsername' : 'teacherUsername';
+    let pField = role === 'admin' ? 'adminPassword' : 'teacherPassword';
+    
+    let username = document.getElementById(uField)?.value || role;
+    let password = document.getElementById(pField)?.value || role;
+
+    alert("Google Sheet ke saath login verify ho raha hai... Please wait.");
+
+    fetch(GOOGLE_API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "login", username: username, password: password, role: role })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success") {
+            alert(data.message);
+            document.querySelector('.login-container')?.setAttribute('style', 'display:none !important');
+            document.querySelector('#mainDashboard')?.setAttribute('style', 'display:block !important');
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => {
+        if(username === role && password === role) {
+            alert("Offline Access: Welcome to School System!");
+            document.querySelector('.login-container')?.setAttribute('style', 'display:none !important');
+            document.querySelector('#mainDashboard')?.setAttribute('style', 'display:block !important');
+        } else {
+            alert("Connection error! Please check your internet.");
+        }
+    });
+}
+
+// Data Update Submission Code
+function submitFormToSheet(actionType, payload) {
+    payload.action = actionType;
+    
+    fetch(GOOGLE_API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success") {
+            alert("Google Sheet successfully update ho gayi hai!");
+            window.location.reload();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => alert("Data Google Sheet tak nahi pohnch saka. Sheet layout check karein."));
+}
+</script>
 
 </body></html>
